@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="knockout-3.4.2.js"></script>
+</head>
+
+<body>
+    The name is <span data-bind="text: personName"></span><span data-bind="text: personAge"></span>
+    <p>好长的文字啊<span data-bind="text: fullName"></span></p>
+    <h2 data-bind='text:price'></h2>
+    <h4 data-bind='text:myObservableArray().length'></h4>
+</body>
+<script>
+    var myViewModel = {
+        personName: ko.observable('Bob'),
+        personAge: ko.observable(123),
+        price: ko.observable(666),
+        myObservableArray: ko.observableArray([
+            { name: "Bungle", type: "Bear" },
+            { name: "George", type: "Hippo" },
+            { name: "Zippy", type: "Unknown" }
+        ])
+    };
+    myViewModel.fullName = ko.dependentObservable(function () {
+        return this.personName() + "好长的数字啊" + this.personAge();
+    }, myViewModel);
+
+    myViewModel.formattedPrice = ko.dependentObservable({
+
+        read: function () {
+            console.log(this.price().toFixed(2));
+            return "$" + this.price().toFixed(2);
+        },
+
+        write: function (value) {
+            console.log(value);
+            // Strip out unwanted characters, parse as float, then write the raw data back to the underlying "price" observable
+            value = parseFloat(value.replace(/[^\.\d]/g, ""));
+            this.price(isNaN(value) ? 0 : value); // Write to underlying storage
+        },
+        owner: myViewModel
+    });
+
+
+
+
+    ko.applyBindings(myViewModel);
+
+    setInterval(function () {
+        myViewModel.myObservableArray.push('Some value');
+    }, 1000);
+
+    setTimeout(function () {
+        myViewModel.formattedPrice("111");
+    }, 1000);
+
+    setInterval(function () {
+        myViewModel.personName(+new Date())
+            .personAge(+new Date() + 100);
+    }, 1000)
+
+    var subscription = myViewModel.personName.subscribe(function (newValue) {
+        console.log("The person's new name is " + newValue);
+    });
+
+    setTimeout(function () {
+        // ...then later...
+        subscription.dispose(); // I no longer want notifications
+    }, 10000);
+
+</script>
+
+</html>

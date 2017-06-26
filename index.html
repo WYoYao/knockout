@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="knockout-3.4.2.js"></script>
+</head>
+
+<body>
+    <h3>Meal upgrades</h3>
+    <p>Make your flight more bearable by selecting a meal to match your social and economic status.</p>
+    Chosen meal: <select data-bind="options: availableMeals,
+                                optionsText: 'mealName',value:chosenMeal"></select>
+    <p>
+        You've chosen:
+        <b data-bind="text: chosenMeal().description"></b> (price: <span data-bind='text: formatPrice(chosenMeal().extraCost)'></span>)
+    </p>
+    <h2>There are <span data-bind="text: myItems().count"></span> items</h2>
+</body>
+<script>
+    var availableMeals = [
+        { mealName: 'Standard', description: 'Dry crusts of bread', extraCost: 0 },
+        { mealName: 'Premium', description: 'Fresh bread with cheese', extraCost: 9.95 },
+        { mealName: 'Deluxe', description: 'Caviar and vintage Dr Pepper', extraCost: 18.50 }
+    ];
+    var viewModel = {
+        chosenMeal: ko.observable(availableMeals[0])
+    };
+    ko.applyBindings(viewModel);
+    function formatPrice(price) {
+        return price == 0 ? "Free" : "$" + price.toFixed(2);
+    }
+
+    var myItems=[1,2,3,4];
+    ko.applyBindings({
+        myItems:ko.observable(myItems.length)
+    });
+
+
+</script>
+
+</html>
